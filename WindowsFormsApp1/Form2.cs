@@ -183,5 +183,28 @@ namespace WindowsFormsApp1
                 MessageBox.Show("Выберите запись для изменения.");
             }
         }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string searchText = textBox7.Text;
+
+            string connectionString = "Server=localhost;Port=5432;Database=bank;User ID=postgres;Password=123";
+            using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string searchQuery = "SELECT * FROM \"Договор\" WHERE CAST(\"ID Договора\" AS TEXT) LIKE @searchText OR CAST(\"ID Клиента\" AS TEXT) LIKE @searchText OR CAST(\"Номер счёта\" AS TEXT) LIKE @searchText OR CAST(\"Процент первоначального взноса\" AS TEXT) LIKE @searchText OR CAST(\"Стоимость товара\" AS TEXT) LIKE @searchText OR CAST(\"Дата договора\" AS TEXT) LIKE @searchText";
+
+                using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(searchQuery, connection))
+                {
+                    adapter.SelectCommand.Parameters.AddWithValue("@searchText", "%" + searchText + "%");
+
+                    DataTable searchResult = new DataTable();
+                    adapter.Fill(searchResult);
+
+                    dataGridView1.DataSource = searchResult;
+                }
+            }
+        }
     }
 }
